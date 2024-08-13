@@ -45,12 +45,27 @@ model FriendRequest {
   // 请求发送方
   fromUserId Int
   // 请求接收方(是否同意方)
-  toUserId Int
+  toUserId   Int
   // 备注
-  reason String @db.VarChar(100)
+  reason     String   @db.VarChar(100)
   // 状态 0 请求中 1 已同意 2 已拒绝
-  status Int
+  status     Int
   createTime DateTime @default(now())
   updateTime DateTime @updatedAt
+}
 
+model Chatroom {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  // 聊天室类型 true 群聊 false 单聊
+  type       Boolean  @default(false)
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+}
+
+model UserChatroom {
+  userId     Int
+  chatroomId Int
+
+  @@id([userId, chatroomId])
 }

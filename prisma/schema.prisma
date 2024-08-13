@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique @db.VarChar(50)
+  password   String   @db.VarChar(50)
+  nickName   String   @db.VarChar(50)
+  headPic    String   @default("") @db.VarChar(100)
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+
+  friends        Friendship[] @relation("userToFriend")
+  inverseFriends Friendship[] @relation("friendToUser")
+}
+
+// 好友关系表
+model Friendship {
+  user   User @relation("userToFriend", fields: [userId], references: [id])
+  userId Int
+
+  friend   User @relation("friendToUser", fields: [friendId], references: [id])
+  friendId Int
+
+  @@id([userId, friendId])
+}
+
+// 好友申请表
+model FriendRequest {
+  id Int @id @default(autoincrement())
+
+  // 请求发送方
+  fromUserId Int
+  // 请求接收方(是否同意方)
+  toUserId Int
+  // 备注
+  reason String @db.VarChar(100)
+  // 状态 0 请求中 1 已同意 2 已拒绝
+  status Int
+  createTime DateTime @default(now())
+  updateTime DateTime @updatedAt
+
+}
